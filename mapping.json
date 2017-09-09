@@ -1,0 +1,8 @@
+[
+  {
+    "DeviceName": "/dev/sdb",
+    "Ebs": {
+      "VolumeSize": 10
+    }
+  }
+]
