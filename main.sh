@@ -35,12 +35,22 @@ aws ec2 associate-route-table --subnet-id ${PRIVATE_SUBNET} --route-table-id ${P
 
 # CREATE ROLE
 ROLE_NAME=devops_ed
-POLICY_NAME=devops_ed_cwt_policy
+POLICY_NAME=devops_ed_s3_cwt_policy
 
 aws iam create-role --role-name ${ROLE_NAME} --assume-role-policy-document file://assume_policy.json
-aws iam put-role-policy --policy-name ${POLICY_NAME} --role-name ${ROLE_NAME} --policy-document file://cwt_role.json
+aws iam put-role-policy --policy-name ${POLICY_NAME} --role-name ${ROLE_NAME} --policy-document file://s3_cwt_role.json
 aws iam create-instance-profile --instance-profile-name ${ROLE_NAME}
 aws iam add-role-to-instance-profile --instance-profile-name ${ROLE_NAME} --role-name ${ROLE_NAME}
+sleep 60
+
+
+# CREATE BUCKET AND PUSH SCRIPTS
+ACCOUNT_ID=$(aws sts get-caller-identity --output text --query 'Account')
+sed -i "s/REGION/${REGION}/" dfree.sh
+aws s3api create-bucket --bucket my-bucket-${ACCOUNT_ID} --region ${REGION} --create-bucket-configuration LocationConstraint=${REGION}
+aws s3 cp dfree.sh s3://my-bucket-${ACCOUNT_ID}/dfree.sh
+sed -i "s/ACCOUNT_ID/${ACCOUNT_ID}/" userdata_master.sh
+sed -i "s/ACCOUNT_ID/${ACCOUNT_ID}/" userdata_slave.sh
 
 
 # LAUNCH JENKINS INSTANCES

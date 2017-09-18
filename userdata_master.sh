@@ -15,3 +15,6 @@ service jenkins restart
 sleep 180
 echo 'jenkins.model.Jenkins.instance.securityRealm.createAccount("slave", "SLAVE_PASSWD")' | java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$(cat /var/lib/jenkins/secrets/initialAdminPassword) groovy =
 echo 'jenkins.model.Jenkins.instance.setSlaveAgentPort(JNLP_PORT)' | java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$(cat /var/lib/jenkins/secrets/initialAdminPassword) groovy =
+/usr/bin/aws s3 cp s3://my-bucket-ACCOUNT_ID/dfree.sh /usr/bin/dfree.sh
+chmod 755 /usr/bin/dfree.sh
+cat <(echo "*/5 * * * * /usr/bin/dfree.sh") | crontab -
